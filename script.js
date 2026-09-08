@@ -1,26 +1,24 @@
-/* =========================================
-   CONFIGURAÇÃO
-========================================= */
-
 const CONFIG = {
+    dataEvento: "2026-10-31T07:30:00-03:00",
+    whatsapp: "558294270156",
 
-    /*
-        Horário de Brasília.
-        31/10/2026 às 08:00.
-    */
+    supabaseUrl: "https://kyexqnpewzsvzxltodxx.supabase.co",
 
-    dataEvento:
-        "2026-10-31T08:00:00-03:00",
-
-    whatsapp:
-        "5582993471405"
-
+    // Publishable key do projeto
+    supabaseKey: "sb_publishable_IrHeJmjMbnM-Wgj2_pOy9g_lqSyk4Hn"
 };
 
 
-/* =========================================
-   ELEMENTOS
-========================================= */
+/* supabase */
+
+const supabaseClient =
+    window.supabase.createClient(
+        CONFIG.supabaseUrl,
+        CONFIG.supabaseKey
+    );
+
+
+/* elementos */
 
 const header =
     document.getElementById("header");
@@ -49,15 +47,19 @@ const whatsappForm =
 const whatsappFloat =
     document.getElementById("whatsappFloat");
 
+const btnEnviar =
+    document.getElementById("btnEnviar");
+
+const consentimento =
+    document.getElementById("consentimento");
+
 const radios =
     document.querySelectorAll(
         'input[name="frequenta"]'
     );
 
 
-/* =========================================
-   HEADER
-========================================= */
+/* header */
 
 function controlarHeader() {
 
@@ -65,17 +67,10 @@ function controlarHeader() {
         return;
     }
 
-
-    if (window.scrollY > 40) {
-
-        header.classList.add("scrolled");
-
-    } else {
-
-        header.classList.remove("scrolled");
-
-    }
-
+    header.classList.toggle(
+        "scrolled",
+        window.scrollY > 40
+    );
 }
 
 
@@ -91,9 +86,7 @@ window.addEventListener(
 controlarHeader();
 
 
-/* =========================================
-   ANIMAÇÃO AO ROLAR
-========================================= */
+/* animações */
 
 const elementosReveal =
     document.querySelectorAll(".reveal");
@@ -109,14 +102,13 @@ const observer =
                     return;
                 }
 
-
-                entry.target.classList.add("show");
-
+                entry.target.classList.add(
+                    "show"
+                );
 
                 observerAtual.unobserve(
                     entry.target
                 );
-
             });
 
         },
@@ -133,9 +125,7 @@ elementosReveal.forEach(elemento => {
 });
 
 
-/* =========================================
-   CONTADOR
-========================================= */
+/* contador */
 
 const dataEvento =
     new Date(
@@ -165,7 +155,6 @@ function doisDigitos(numero) {
         2,
         "0"
     );
-
 }
 
 
@@ -175,13 +164,8 @@ function atualizarContador() {
         return;
     }
 
-
-    const agora =
-        Date.now();
-
-
     const diferenca =
-        dataEvento - agora;
+        dataEvento - Date.now();
 
 
     if (diferenca <= 0) {
@@ -191,7 +175,9 @@ function atualizarContador() {
                 class="count-box"
                 style="grid-column: 1 / -1;"
             >
-                <strong>Evento iniciado!</strong>
+                <strong>
+                    Evento iniciado!
+                </strong>
 
                 <span>
                     Seja bem-vindo.
@@ -204,7 +190,6 @@ function atualizarContador() {
         );
 
         return;
-
     }
 
 
@@ -239,18 +224,14 @@ function atualizarContador() {
     diasElemento.textContent =
         dias;
 
-
     horasElemento.textContent =
         doisDigitos(horas);
-
 
     minutosElemento.textContent =
         doisDigitos(minutos);
 
-
     segundosElemento.textContent =
         doisDigitos(segundos);
-
 }
 
 
@@ -264,9 +245,7 @@ const intervaloContador =
 atualizarContador();
 
 
-/* =========================================
-   MÁSCARA TELEFONE
-========================================= */
+/* telefone */
 
 function formatarTelefone(valor) {
 
@@ -276,29 +255,23 @@ function formatarTelefone(valor) {
             .slice(0, 11);
 
 
-    if (numeros.length === 0) {
-
+    if (!numeros) {
         return "";
-
     }
 
 
     if (numeros.length <= 2) {
-
         return `(${numeros}`;
-
     }
 
 
     if (numeros.length <= 7) {
 
         return `(${numeros.slice(0, 2)}) ${numeros.slice(2)}`;
-
     }
 
 
     return `(${numeros.slice(0, 2)}) ${numeros.slice(2, 7)}-${numeros.slice(7)}`;
-
 }
 
 
@@ -312,14 +285,11 @@ inputNumero.addEventListener(
             );
 
         atualizarLinksWhatsApp();
-
     }
 );
 
 
-/* =========================================
-   CASA ESPÍRITA
-========================================= */
+/* instituição */
 
 radios.forEach(radio => {
 
@@ -327,114 +297,33 @@ radios.forEach(radio => {
         "change",
         event => {
 
-            if (
-                event.target.value === "sim"
-            ) {
+            const mostrarCasa =
+                event.target.value === "sim";
 
-                campoCasa.classList.remove(
-                    "hidden"
-                );
 
-                inputCasa.required =
-                    true;
+            campoCasa.classList.toggle(
+                "hidden",
+                !mostrarCasa
+            );
 
-            } else {
 
-                campoCasa.classList.add(
-                    "hidden"
-                );
+            inputCasa.required =
+                mostrarCasa;
 
-                inputCasa.required =
-                    false;
 
-                inputCasa.value =
-                    "";
-
+            if (!mostrarCasa) {
+                inputCasa.value = "";
             }
 
 
             atualizarLinksWhatsApp();
-
         }
     );
 
 });
 
 
-/* =========================================
-   LOCAL STORAGE
-========================================= */
-
-function pegarInscricoes() {
-
-    try {
-
-        const dados =
-            localStorage.getItem(
-                "inscricoes"
-            );
-
-
-        return dados
-            ? JSON.parse(dados)
-            : [];
-
-    } catch (erro) {
-
-        console.error(
-            "Não foi possível ler as inscrições:",
-            erro
-        );
-
-        return [];
-
-    }
-
-}
-
-
-function salvarInscricao(
-    inscricao
-) {
-
-    try {
-
-        const inscricoes =
-            pegarInscricoes();
-
-
-        inscricoes.push(
-            inscricao
-        );
-
-
-        localStorage.setItem(
-            "inscricoes",
-            JSON.stringify(
-                inscricoes
-            )
-        );
-
-
-        return true;
-
-    } catch (erro) {
-
-        console.error(
-            "Não foi possível salvar:",
-            erro
-        );
-
-        return false;
-
-    }
-
-}
-
-
-/* =========================================
-   MENSAGEM
-========================================= */
+/* mensagens */
 
 function mostrarMensagem(
     texto,
@@ -445,28 +334,18 @@ function mostrarMensagem(
         texto;
 
 
-    if (tipo === "sucesso") {
-
-        mensagem.style.color =
-            "#16803a";
-
-    } else {
-
-        mensagem.style.color =
-            "#b42318";
-
-    }
-
+    mensagem.style.color =
+        tipo === "sucesso"
+            ? "#16803a"
+            : "#b42318";
 }
 
 
-/* =========================================
-   FORM SUBMIT
-========================================= */
+/* inscrição */
 
 form.addEventListener(
     "submit",
-    event => {
+    async event => {
 
         event.preventDefault();
 
@@ -496,9 +375,7 @@ form.addEventListener(
             inputCasa.value.trim();
 
 
-        /* -------------------------------
-           NOME
-        -------------------------------- */
+        /* validações */
 
         if (nome.length < 4) {
 
@@ -510,13 +387,8 @@ form.addEventListener(
             inputNome.focus();
 
             return;
-
         }
 
-
-        /* -------------------------------
-           TELEFONE
-        -------------------------------- */
 
         if (
             numeroLimpo.length !== 10 &&
@@ -531,13 +403,8 @@ form.addEventListener(
             inputNumero.focus();
 
             return;
-
         }
 
-
-        /* -------------------------------
-           RADIO
-        -------------------------------- */
 
         if (!frequenta) {
 
@@ -547,13 +414,8 @@ form.addEventListener(
             );
 
             return;
-
         }
 
-
-        /* -------------------------------
-           CASA
-        -------------------------------- */
 
         if (
             frequenta.value === "sim" &&
@@ -568,94 +430,122 @@ form.addEventListener(
             inputCasa.focus();
 
             return;
-
         }
 
 
-        /* -------------------------------
-           OBJETO
-        -------------------------------- */
-
-        const inscricao = {
-
-            id:
-                crypto.randomUUID
-                    ? crypto.randomUUID()
-                    : String(Date.now()),
-
-            nome,
-
-            numero,
-
-            frequenta:
-                frequenta.value,
-
-            casa:
-                frequenta.value === "sim"
-                    ? casa
-                    : "Não frequenta",
-
-            data:
-                new Date().toLocaleString(
-                    "pt-BR"
-                )
-
-        };
-
-
-        /* -------------------------------
-           SALVAR
-        -------------------------------- */
-
-        const salvou =
-            salvarInscricao(
-                inscricao
-            );
-
-
-        if (!salvou) {
+        if (!consentimento.checked) {
 
             mostrarMensagem(
-                "Não foi possível registrar os dados neste dispositivo.",
+                "Você precisa concordar com o uso dos dados para concluir a inscrição.",
                 "erro"
             );
 
-            return;
+            consentimento.focus();
 
+            return;
         }
 
 
-        /* -------------------------------
-           SUCESSO
-        -------------------------------- */
+        /* evita duplo clique */
 
-        mostrarMensagem(
-            "Inscrição registrada com sucesso!",
-            "sucesso"
-        );
+        btnEnviar.disabled = true;
+
+        btnEnviar.textContent =
+            "Enviando...";
 
 
-        form.reset();
+        /* dados para o banco */
+
+        const inscricao = {
+
+            nome,
+
+            whatsapp:
+                numero,
+
+            frequenta_casa:
+                frequenta.value === "sim",
+
+            casa_espirita:
+                frequenta.value === "sim"
+                    ? casa
+                    : null,
+
+            consentimento:
+                consentimento.checked
+        };
 
 
-        campoCasa.classList.add(
-            "hidden"
-        );
+        try {
+
+            const { error } =
+                await supabaseClient
+                    .from("inscricoes")
+                    .insert(inscricao);
 
 
-        inputCasa.required =
-            false;
+            if (error) {
+
+                console.error(
+                    "Erro do Supabase:",
+                    error
+                );
+
+                mostrarMensagem(
+                    "Não foi possível concluir a inscrição. Tente novamente.",
+                    "erro"
+                );
+
+                return;
+            }
 
 
-        atualizarLinksWhatsApp();
+            mostrarMensagem(
+                "Inscrição realizada com sucesso!",
+                "sucesso"
+            );
+
+
+            form.reset();
+
+
+            campoCasa.classList.add(
+                "hidden"
+            );
+
+
+            inputCasa.required =
+                false;
+
+
+            atualizarLinksWhatsApp();
+
+        } catch (erro) {
+
+            console.error(
+                "Erro ao enviar inscrição:",
+                erro
+            );
+
+
+            mostrarMensagem(
+                "Não foi possível conectar ao servidor. Tente novamente.",
+                "erro"
+            );
+
+        } finally {
+
+            btnEnviar.disabled = false;
+
+            btnEnviar.textContent =
+                "Confirmar inscrição";
+        }
 
     }
 );
 
 
-/* =========================================
-   WHATSAPP
-========================================= */
+/* whatsapp */
 
 function criarMensagemWhatsApp() {
 
@@ -685,7 +575,6 @@ function criarMensagemWhatsApp() {
 
         texto +=
             `\n\nMeu nome: ${nome}`;
-
     }
 
 
@@ -693,7 +582,6 @@ function criarMensagemWhatsApp() {
 
         texto +=
             `\nWhatsApp: ${numero}`;
-
     }
 
 
@@ -704,32 +592,27 @@ function criarMensagemWhatsApp() {
 
         texto +=
             `\nInstituição: ${casa}`;
-
     }
 
 
     return texto;
-
 }
 
 
 function atualizarLinksWhatsApp() {
 
-    const mensagemWhatsapp =
+    const texto =
         criarMensagemWhatsApp();
 
 
     const url =
-        `https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(
-            mensagemWhatsapp
-        )}`;
+        `https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(texto)}`;
 
 
     if (whatsappForm) {
 
         whatsappForm.href =
             url;
-
     }
 
 
@@ -737,29 +620,38 @@ function atualizarLinksWhatsApp() {
 
         whatsappFloat.href =
             url;
-
     }
-
 }
 
 
-[inputNome, inputCasa]
-    .forEach(input => {
+[
+    inputNome,
+    inputNumero,
+    inputCasa
+].forEach(input => {
 
-        input.addEventListener(
-            "input",
-            atualizarLinksWhatsApp
-        );
+    input.addEventListener(
+        "input",
+        atualizarLinksWhatsApp
+    );
 
-    });
+});
+
+
+radios.forEach(radio => {
+
+    radio.addEventListener(
+        "change",
+        atualizarLinksWhatsApp
+    );
+
+});
 
 
 atualizarLinksWhatsApp();
 
 
-/* =========================================
-   WHATSAPP FLUTUANTE
-========================================= */
+/* botão flutuante */
 
 function controlarWhatsApp() {
 
@@ -768,20 +660,10 @@ function controlarWhatsApp() {
     }
 
 
-    if (window.scrollY > 350) {
-
-        whatsappFloat.classList.add(
-            "show"
-        );
-
-    } else {
-
-        whatsappFloat.classList.remove(
-            "show"
-        );
-
-    }
-
+    whatsappFloat.classList.toggle(
+        "show",
+        window.scrollY > 350
+    );
 }
 
 
