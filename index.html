@@ -386,18 +386,18 @@
                         <span>
                             INSCRIÇÃO SOLIDÁRIA
                         </span>
-
-                        <h2>
-                            Sua participação também
-                            pode ajudar alguém.
-                        </h2>
-
+                        
                         <p>
-                            A inscrição será realizada mediante a
-                            doação de
+                            <h2>
+                                Sua participação também
+                                pode ajudar alguém.
+                            </h2>
+                            Contribua com a doação de
                             <strong>
+
                                 1 kg de alimento não perecível
-                            </strong>.
+                            </strong>
+                            no local do evento. (As doações serão destinadas ao projeto da Campanha do Quilo).
                         </p>
 
                     </div>
@@ -984,15 +984,15 @@
                             <div class="tip-content">
 
                                 <strong>
-                                    Lembrete importante
+                                    Lembrete importante (VAGAS LIMITADAS)
                                 </strong>
 
                                 <p>
-                                    Não esqueça de levar
+                                    Sua inscrição será confirmada mediante a doação de
                                     <strong>
-                                        1 kg de alimento não perecível
+                                        1 kg de alimento não perecível,
                                     </strong>
-                                    no dia do seminário.
+                                    que deverá ser entregue no local do evento.
                                 </p>
 
                             </div>
@@ -1054,11 +1054,21 @@
                                     WhatsApp
                                 </label>
 
-                                <input type="tel" id="numero" name="numero" placeholder="(82) 99999-9999" maxlength="15"
+                                <input type="tel" id="numero" name="numero" placeholder="(99) 99999-9999" maxlength="15"
                                     autocomplete="tel" required>
 
                             </div>
 
+                            <div class="field">
+
+                                <label for="cpf">
+                                    CPF
+                                </label>
+
+                                <input type="text" id="cpf" name="cpf" placeholder="000.000.000-00" maxlength="14"
+                                    inputmode="numeric" autocomplete="off" required>
+
+                            </div>
 
                             <fieldset class="field-group">
 
@@ -1124,7 +1134,7 @@
 
                             <a href="#" id="whatsappForm" class="btn btn-whatsapp" target="_blank"
                                 rel="noopener noreferrer">
-                                Inscrever pelo WhatsApp
+                                Falar com a organização pelo WhatsApp
                             </a>
 
 
@@ -1200,11 +1210,11 @@
                         </summary>
 
                         <p>
-                            A inscrição será realizada mediante
-                            a doação de
+                            Sua inscrição será confirmada mediante a doação de 
                             <strong>
-                                1 kg de alimento não perecível.
+                                1 kg de alimento não perecível,
                             </strong>
+                            que deverá ser entregue no local do evento.
                         </p>
 
                     </details>
@@ -1277,6 +1287,59 @@
 
 
     <!-- FOOTER -->
+
+    <div class="modal-overlay" id="modalSucesso" aria-hidden="true">
+
+        <div class="success-modal" role="dialog" aria-modal="true" aria-labelledby="tituloSucesso">
+
+            <button type="button" class="modal-close" id="fecharModal" aria-label="Fechar">
+                ×
+            </button>
+
+
+            <div class="success-icon">
+                ✓
+            </div>
+
+
+            <span class="success-label">
+                INSCRIÇÃO CONFIRMADA
+            </span>
+
+
+            <h2 id="tituloSucesso">
+                Tudo certo!
+            </h2>
+
+
+            <p>
+                Sua inscrição foi registrada com sucesso.
+                Esperamos você no Seminário IEFMC 2026.
+            </p>
+
+
+            <div class="modal-reminder">
+
+                <strong>
+                    Lembrete
+                </strong>
+
+                <span>
+                    Não esqueça de levar
+                    <strong>1 kg de alimento não perecível</strong>
+                    no dia do seminário.
+                </span>
+
+            </div>
+
+
+            <button type="button" class="btn btn-modal" id="fecharModalButton">
+                Entendi
+            </button>
+
+        </div>
+
+    </div>
 
     <footer>
 

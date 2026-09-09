@@ -4,18 +4,15 @@ const CONFIG = {
 
     supabaseUrl: "https://kyexqnpewzsvzxltodxx.supabase.co",
 
-    // Publishable key do projeto
-    supabaseKey: "sb_publishable_IrHeJmjMbnM-Wgj2_pOy9g_lqSyk4Hn"
+    // Mantenha aqui sua publishable key atual.
+    supabaseKey: "SUA_PUBLISHABLE_KEY"
 };
 
 
-/* supabase */
-
-const supabaseClient =
-    window.supabase.createClient(
-        CONFIG.supabaseUrl,
-        CONFIG.supabaseKey
-    );
+const supabaseClient = window.supabase.createClient(
+    CONFIG.supabaseUrl,
+    CONFIG.supabaseKey
+);
 
 
 /* elementos */
@@ -31,6 +28,9 @@ const inputNome =
 
 const inputNumero =
     document.getElementById("numero");
+
+const inputCpf =
+    document.getElementById("cpf");
 
 const inputCasa =
     document.getElementById("casa");
@@ -52,6 +52,15 @@ const btnEnviar =
 
 const consentimento =
     document.getElementById("consentimento");
+
+const modalSucesso =
+    document.getElementById("modalSucesso");
+
+const fecharModal =
+    document.getElementById("fecharModal");
+
+const fecharModalButton =
+    document.getElementById("fecharModalButton");
 
 const radios =
     document.querySelectorAll(
@@ -92,37 +101,49 @@ const elementosReveal =
     document.querySelectorAll(".reveal");
 
 
-const observer =
-    new IntersectionObserver(
-        (entries, observerAtual) => {
+if ("IntersectionObserver" in window) {
 
-            entries.forEach(entry => {
+    const observer =
+        new IntersectionObserver(
+            (entries, observerAtual) => {
 
-                if (!entry.isIntersecting) {
-                    return;
-                }
+                entries.forEach(entry => {
 
-                entry.target.classList.add(
-                    "show"
-                );
+                    if (!entry.isIntersecting) {
+                        return;
+                    }
 
-                observerAtual.unobserve(
-                    entry.target
-                );
-            });
+                    entry.target.classList.add(
+                        "show"
+                    );
 
-        },
-        {
-            threshold: 0.12
-        }
-    );
+                    observerAtual.unobserve(
+                        entry.target
+                    );
+                });
+
+            },
+            {
+                threshold: 0.12
+            }
+        );
 
 
-elementosReveal.forEach(elemento => {
+    elementosReveal.forEach(elemento => {
 
-    observer.observe(elemento);
+        observer.observe(elemento);
 
-});
+    });
+
+} else {
+
+    elementosReveal.forEach(elemento => {
+
+        elemento.classList.add("show");
+
+    });
+
+}
 
 
 /* contador */
@@ -163,6 +184,7 @@ function atualizarContador() {
     if (!countdown) {
         return;
     }
+
 
     const diferenca =
         dataEvento - Date.now();
@@ -261,6 +283,7 @@ function formatarTelefone(valor) {
 
 
     if (numeros.length <= 2) {
+
         return `(${numeros}`;
     }
 
@@ -289,6 +312,125 @@ inputNumero.addEventListener(
 );
 
 
+/* CPF */
+
+function formatarCpf(valor) {
+
+    const numeros =
+        valor
+            .replace(/\D/g, "")
+            .slice(0, 11);
+
+
+    if (numeros.length <= 3) {
+
+        return numeros;
+    }
+
+
+    if (numeros.length <= 6) {
+
+        return `${numeros.slice(0, 3)}.${numeros.slice(3)}`;
+    }
+
+
+    if (numeros.length <= 9) {
+
+        return `${numeros.slice(0, 3)}.${numeros.slice(3, 6)}.${numeros.slice(6)}`;
+    }
+
+
+    return `${numeros.slice(0, 3)}.${numeros.slice(3, 6)}.${numeros.slice(6, 9)}-${numeros.slice(9)}`;
+}
+
+
+function cpfValido(valor) {
+
+    const cpf =
+        valor.replace(
+            /\D/g,
+            ""
+        );
+
+
+    if (cpf.length !== 11) {
+        return false;
+    }
+
+
+    if (/^(\d)\1{10}$/.test(cpf)) {
+        return false;
+    }
+
+
+    let soma = 0;
+
+
+    for (let i = 0; i < 9; i++) {
+
+        soma +=
+            Number(cpf[i]) *
+            (10 - i);
+    }
+
+
+    let resto =
+        (soma * 10) % 11;
+
+
+    if (resto === 10) {
+        resto = 0;
+    }
+
+
+    if (
+        resto !==
+        Number(cpf[9])
+    ) {
+        return false;
+    }
+
+
+    soma = 0;
+
+
+    for (let i = 0; i < 10; i++) {
+
+        soma +=
+            Number(cpf[i]) *
+            (11 - i);
+    }
+
+
+    resto =
+        (soma * 10) % 11;
+
+
+    if (resto === 10) {
+        resto = 0;
+    }
+
+
+    return (
+        resto ===
+        Number(cpf[10])
+    );
+}
+
+
+inputCpf.addEventListener(
+    "input",
+    event => {
+
+        event.target.value =
+            formatarCpf(
+                event.target.value
+            );
+
+    }
+);
+
+
 /* instituição */
 
 radios.forEach(radio => {
@@ -312,7 +454,10 @@ radios.forEach(radio => {
 
 
             if (!mostrarCasa) {
-                inputCasa.value = "";
+
+                inputCasa.value =
+                    "";
+
             }
 
 
@@ -341,6 +486,125 @@ function mostrarMensagem(
 }
 
 
+/* modal */
+
+let timerModal;
+
+
+function abrirModalSucesso() {
+
+    if (!modalSucesso) {
+        return;
+    }
+
+
+    modalSucesso.classList.add(
+        "show"
+    );
+
+
+    modalSucesso.setAttribute(
+        "aria-hidden",
+        "false"
+    );
+
+
+    document.body.classList.add(
+        "modal-open"
+    );
+
+
+    clearTimeout(
+        timerModal
+    );
+
+
+    timerModal =
+        setTimeout(
+            fecharModalSucesso,
+            5000
+        );
+
+
+    fecharModal?.focus();
+}
+
+
+function fecharModalSucesso() {
+
+    if (!modalSucesso) {
+        return;
+    }
+
+
+    modalSucesso.classList.remove(
+        "show"
+    );
+
+
+    modalSucesso.setAttribute(
+        "aria-hidden",
+        "true"
+    );
+
+
+    document.body.classList.remove(
+        "modal-open"
+    );
+
+
+    clearTimeout(
+        timerModal
+    );
+}
+
+
+fecharModal?.addEventListener(
+    "click",
+    fecharModalSucesso
+);
+
+
+fecharModalButton?.addEventListener(
+    "click",
+    fecharModalSucesso
+);
+
+
+modalSucesso?.addEventListener(
+    "click",
+    event => {
+
+        if (
+            event.target ===
+            modalSucesso
+        ) {
+
+            fecharModalSucesso();
+
+        }
+
+    }
+);
+
+
+document.addEventListener(
+    "keydown",
+    event => {
+
+        if (
+            event.key === "Escape" &&
+            modalSucesso?.classList.contains("show")
+        ) {
+
+            fecharModalSucesso();
+
+        }
+
+    }
+);
+
+
 /* inscrição */
 
 form.addEventListener(
@@ -360,6 +624,17 @@ form.addEventListener(
 
         const numeroLimpo =
             numero.replace(
+                /\D/g,
+                ""
+            );
+
+
+        const cpf =
+            inputCpf.value.trim();
+
+
+        const cpfLimpo =
+            cpf.replace(
                 /\D/g,
                 ""
             );
@@ -406,6 +681,19 @@ form.addEventListener(
         }
 
 
+        if (!cpfValido(cpf)) {
+
+            mostrarMensagem(
+                "Digite um CPF válido.",
+                "erro"
+            );
+
+            inputCpf.focus();
+
+            return;
+        }
+
+
         if (!frequenta) {
 
             mostrarMensagem(
@@ -446,15 +734,12 @@ form.addEventListener(
         }
 
 
-        /* evita duplo clique */
-
-        btnEnviar.disabled = true;
+        btnEnviar.disabled =
+            true;
 
         btnEnviar.textContent =
             "Enviando...";
 
-
-        /* dados para o banco */
 
         const inscricao = {
 
@@ -462,6 +747,9 @@ form.addEventListener(
 
             whatsapp:
                 numero,
+
+            cpf:
+                cpfLimpo,
 
             frequenta_casa:
                 frequenta.value === "sim",
@@ -473,6 +761,7 @@ form.addEventListener(
 
             consentimento:
                 consentimento.checked
+
         };
 
 
@@ -491,19 +780,28 @@ form.addEventListener(
                     error
                 );
 
-                mostrarMensagem(
-                    "Não foi possível concluir a inscrição. Tente novamente.",
-                    "erro"
-                );
+
+                if (
+                    error.code === "23505"
+                ) {
+
+                    mostrarMensagem(
+                        "Esse CPF já foi utilizado em uma inscrição. Caso precise corrigir seus dados, fale com a organização.",
+                        "erro"
+                    );
+
+                } else {
+
+                    mostrarMensagem(
+                        "Não foi possível concluir a inscrição. Tente novamente.",
+                        "erro"
+                    );
+
+                }
+
 
                 return;
             }
-
-
-            mostrarMensagem(
-                "Inscrição realizada com sucesso!",
-                "sucesso"
-            );
 
 
             form.reset();
@@ -518,7 +816,14 @@ form.addEventListener(
                 false;
 
 
+            mensagem.textContent =
+                "";
+
+
             atualizarLinksWhatsApp();
+
+
+            abrirModalSucesso();
 
         } catch (erro) {
 
@@ -535,10 +840,12 @@ form.addEventListener(
 
         } finally {
 
-            btnEnviar.disabled = false;
+            btnEnviar.disabled =
+                false;
 
             btnEnviar.textContent =
                 "Confirmar inscrição";
+
         }
 
     }
@@ -568,13 +875,14 @@ function criarMensagemWhatsApp() {
 
 
     let texto =
-        "Olá! Gostaria de me inscrever no Seminário IEFMC 2026 — A Terapia do Autoamor.";
+        "Olá! Gostaria de falar sobre o Seminário IEFMC 2026 — A Terapia do Autoamor.";
 
 
     if (nome) {
 
         texto +=
             `\n\nMeu nome: ${nome}`;
+
     }
 
 
@@ -582,6 +890,7 @@ function criarMensagemWhatsApp() {
 
         texto +=
             `\nWhatsApp: ${numero}`;
+
     }
 
 
@@ -592,6 +901,7 @@ function criarMensagemWhatsApp() {
 
         texto +=
             `\nInstituição: ${casa}`;
+
     }
 
 
@@ -606,13 +916,16 @@ function atualizarLinksWhatsApp() {
 
 
     const url =
-        `https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(texto)}`;
+        `https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(
+            texto
+        )}`;
 
 
     if (whatsappForm) {
 
         whatsappForm.href =
             url;
+
     }
 
 
@@ -620,7 +933,9 @@ function atualizarLinksWhatsApp() {
 
         whatsappFloat.href =
             url;
+
     }
+
 }
 
 
@@ -664,6 +979,7 @@ function controlarWhatsApp() {
         "show",
         window.scrollY > 350
     );
+
 }
 
 
