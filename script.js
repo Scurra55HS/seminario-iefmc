@@ -5,7 +5,7 @@ const CONFIG = {
     supabaseUrl: "https://kyexqnpewzsvzxltodxx.supabase.co",
 
     // Mantenha aqui sua publishable key atual.
-    supabaseKey: "SUA_PUBLISHABLE_KEY"
+    supabaseKey: "sb_publishable_IrHeJmjMbnM-Wgj2_pOy9g_lqSyk4Hn"
 };
 
 
@@ -775,33 +775,52 @@ form.addEventListener(
 
             if (error) {
 
-                console.error(
-                    "Erro do Supabase:",
-                    error
-                );
+    console.error(
+        "Erro do Supabase:",
+        {
+            code: error.code,
+            message: error.message,
+            details: error.details,
+            hint: error.hint
+        }
+    );
 
 
-                if (
-                    error.code === "23505"
-                ) {
+    if (error.code === "23505") {
 
-                    mostrarMensagem(
-                        "Esse CPF já foi utilizado em uma inscrição. Caso precise corrigir seus dados, fale com a organização.",
-                        "erro"
-                    );
-
-                } else {
-
-                    mostrarMensagem(
-                        "Não foi possível concluir a inscrição. Tente novamente.",
-                        "erro"
-                    );
-
-                }
+        mostrarMensagem(
+            "Esse CPF já foi utilizado em uma inscrição. Caso precise corrigir seus dados, fale com a organização.",
+            "erro"
+        );
 
 
-                return;
-            }
+    } else if (error.code === "42501") {
+
+        mostrarMensagem(
+            "O formulário não possui permissão para registrar a inscrição.",
+            "erro"
+        );
+
+
+    } else if (error.code === "23514") {
+
+        mostrarMensagem(
+            "Os dados enviados não atendem às regras do cadastro.",
+            "erro"
+        );
+
+
+    } else {
+
+        mostrarMensagem(
+            "Não foi possível concluir a inscrição. Tente novamente.",
+            "erro"
+        );
+
+    }
+
+    return;
+}
 
 
             form.reset();
